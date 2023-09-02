@@ -70,29 +70,22 @@ void compare_brute_and_recursive() {
 	free(cmd);
 }
 
-int64_matrix*  generate_random_matrix(const char* command) {
-	system(command);
-	int64_array* arr = int_read("array.txt");
-	uint64_t n = floor(sqrt(arr->count));
-	int64_matrix* res = malloc(sizeof(*res));
-        res->ptr = malloc(sizeof(int64_t*) * n);
-        for(uint64_t i = 0; i < n; i++) {
-                res->ptr[i] = malloc(sizeof(int64_t) * n);
-        }
-        for(uint64_t i = 0; i < n; i++) {
-                for(uint64_t j = 0; j < n; j++) {
-                        res[i][j] = arr->ptr[i * n + j];
-                }
-        }
-	int_free(arr);
-	return res;
-}
-
 void test_naive_multiply(const char* command) {
-	int64_matrix* A = generate_random_matrix(command);
-	int64_matrix* B = generate_random_matrix(command);
-	int64_matrix* C = square_matrix_multiply(A, B);
+	system(command);
+	int64_array* arr1 = int_read("array.txt");
+	system(command);
+	int64_array* arr2 = int_read("array.txt");
+
 	
+	int64_matrix* A = array_to_matrix(arr1);
+	matrix_print(A);
+	int64_matrix* B = array_to_matrix(arr2);
+	matrix_print(B);
+	int64_matrix* C = square_matrix_multiply(A, B);
+	matrix_print(C);
+	matrix_free(A);
+	matrix_free(B);
+	matrix_free(C);
 }
 
 int main(int argc, char** argv) {
@@ -113,5 +106,6 @@ int main(int argc, char** argv) {
 	test_dp("");
 	printf("---------------\n"); */
 	compare_brute_and_recursive();
+	test_naive_multiply("generate.out -10 10 9");
 	return 0;
 }
