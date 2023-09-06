@@ -81,7 +81,7 @@ void test_naive_multiply(const char* command) {
 	matrix_print(A);
 	int64_matrix* B = array_to_matrix(arr2);
 	matrix_print(B);
-	int64_matrix* C = square_matrix_multiply(A, B);
+	int64_matrix* C = matrix_multiply(A, B);
 	matrix_print(C);
 	matrix_free(A);
 	matrix_free(B);
@@ -94,6 +94,7 @@ void cmp_strass(strassen_matrix* A, int64_matrix* B) {
 		for(uint64_t j = 0; j < n; j++) {
 			if(B->ptr[i][j] != A->ptr[A->rmin + i][A->cmin + j]) {
 				printf("test not passed\n");
+				return;
 			}
 		}
 	}
@@ -109,13 +110,11 @@ void test_strassen_multiply(const char* command) {
 
         int64_matrix* A = array_to_matrix(arr1);
         int64_matrix* B = array_to_matrix(arr2);
-        int64_matrix* C = square_matrix_multiply(A, B);
+        int64_matrix* C = matrix_multiply(A, B);
 	strassen_matrix* A_S = matrix_to_strass(A);
 	strassen_matrix* B_S = matrix_to_strass(B);
 	strassen_matrix* C_S = strassen_multiply(A_S, B_S);
 	cmp_strass(C_S, C);
-	strassen_print(C_S);
-	matrix_print(C);
 	strassen_free(A_S);
 	strassen_free(B_S);
 	strassen_free(C_S);
@@ -144,5 +143,17 @@ int main(int argc, char** argv) {
 	printf("---------------\n"); */
 	compare_brute_and_recursive();
 	test_naive_multiply("generate.out -10 10 9");
+	test_strassen_multiply("generate.out -10 10 25 1452");
+	test_strassen_multiply("generate.out -10 10 16 642");
+	test_strassen_multiply("generate.out -100 100 125 2");
+	test_strassen_multiply("generate.out -100 100 49 52");
+	test_strassen_multiply("generate.out -100 100 6324 452");
+	test_strassen_multiply("generate.out -100 100 1024 5");
+	test_strassen_multiply("generate.out -50 50 2048 12");
+	test_strassen_multiply("generate.out -100 100 10000 14");
+	test_strassen_multiply("generate.out -100 100 1 53534");
+	test_strassen_multiply("generate.out -100 100 4 7543");
+	test_strassen_multiply("generate.out -100 100 12 1456");
+	test_strassen_multiply("generate.out -100 100 9000 575");
 	return 0;
 }
