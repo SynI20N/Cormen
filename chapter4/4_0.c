@@ -88,6 +88,43 @@ void test_naive_multiply(const char* command) {
 	matrix_free(C);
 }
 
+void cmp_strass(strassen_matrix* A, int64_matrix* B) {
+	uint64_t n = B->rows;
+	for(uint64_t i = 0; i < n; i++) {
+		for(uint64_t j = 0; j < n; j++) {
+			if(B->ptr[i][j] != A->ptr[A->rmin + i][A->cmin + j]) {
+				printf("test not passed\n");
+			}
+		}
+	}
+	printf("test passed\n");
+}
+
+void test_strassen_multiply(const char* command) {
+        system(command);
+        int64_array* arr1 = int_read("array.txt");
+        system(command);
+        int64_array* arr2 = int_read("array.txt");
+
+
+        int64_matrix* A = array_to_matrix(arr1);
+        int64_matrix* B = array_to_matrix(arr2);
+        int64_matrix* C = square_matrix_multiply(A, B);
+	strassen_matrix* A_S = matrix_to_strass(A);
+	strassen_matrix* B_S = matrix_to_strass(B);
+	strassen_matrix* C_S = strassen_multiply(A_S, B_S);
+	cmp_strass(C_S, C);
+	strassen_print(C_S);
+	matrix_print(C);
+	strassen_free(A_S);
+	strassen_free(B_S);
+	strassen_free(C_S);
+	free(A);
+	free(B);
+        matrix_free(C);
+}
+
+
 int main(int argc, char** argv) {
 	/*test_brute_force("generate -1 1 10");
 	test_recursive("");
