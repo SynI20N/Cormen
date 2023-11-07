@@ -45,6 +45,13 @@ typedef struct{
 	uint64_t rows;
 } int64_matrix;
 
+typedef struct{
+	int64_t** ptr;
+	uint64_t rmin;
+	uint64_t cmin;
+	uint64_t size;
+} strassen_matrix;
+
 //INT ARRAY FUNCTIONS
 SORTAPI int64_array* SORTCALL int_read(const char* path);
 SORTAPI void SORTCALL int_print(int64_array* a);
@@ -71,8 +78,17 @@ SORTAPI uint64_t SORTCALL binary_search(int64_array* a, int64_t value);
 SORTAPI int64_sub SORTCALL brute_force_subarray(int64_array* a);
 SORTAPI int64_sub SORTCALL recursive_subarray(int64_t* a, int64_t lo, int64_t hi);
 SORTAPI int64_sub SORTCALL find_maximum_subarray(int64_array* a);
+//INT MATRIX FUNCTIONS
+SORTAPI int64_matrix* SORTCALL matrix_ctor(uint64_t rows, uint64_t cols);
+SORTAPI strassen_matrix* SORTCALL matrix_to_strass(int64_matrix* a);
+SORTAPI int64_matrix* SORTCALL array_to_matrix(int64_array* a);
+SORTAPI void SORTCALL matrix_print(int64_matrix* A);
+SORTAPI void SORTCALL matrix_free(int64_matrix* A);
+SORTAPI void SORTCALL strassen_print(strassen_matrix* A);
+SORTAPI void SORTCALL strassen_free(strassen_matrix* A);
 //matrix multiplication
-SORTAPI int64_matrix* SORTCALL square_matrix_multiply(int64_matrix* A, int64_matrix* B);
+SORTAPI int64_matrix* SORTCALL matrix_multiply(int64_matrix* A, int64_matrix* B);
+SORTAPI strassen_matrix* SORTCALL strassen_multiply(strassen_matrix* A, strassen_matrix* B);
 
 //STRING ARRAY FUNCTIONS
 SORTAPI str_array* SORTCALL str_read(const char* path);

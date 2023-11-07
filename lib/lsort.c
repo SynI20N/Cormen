@@ -416,22 +416,211 @@ int64_t SORTCALL find_min(int64_array* a) {
 	return res;
 }
 
-int64_matrix* SORTCALL square_matrix_multiply(int64_matrix* A, int64_matrix* B) {
-	uint64_t n = A->rows;
+int64_matrix* SORTCALL matrix_ctor(uint64_t rows, uint64_t cols) {
 	int64_matrix* res = malloc(sizeof(*res));
-	res->ptr = malloc(sizeof(int64_t*) * n);
-      	for(uint64_t i = 0; i < n; i++) {
-		res->ptr[i] = malloc(sizeof(int64_t) * n);
-	}	
-	for(uint64_t i = 0; i < n; i++) {
-		for(uint64_t j = 0; j < n; j++) {
-			res[i][j] = 0;
-			for(uint64_t k = 0; k < n; k++) {
-				res[i][j] += A->ptr[i][k] * B->ptr[k][j];
+        res->ptr = malloc(sizeof(int64_t*) * rows);
+        res->rows = rows;
+        res->cols = cols;
+        for(uint64_t i = 0; i < rows; i++) {
+                res->ptr[i] = malloc(sizeof(int64_t) * cols);
+        }
+	return res;
+}
+
+int64_matrix* SORTCALL array_to_matrix(int64_array* a) {
+        uint64_t n = floor(sqrt(a->count));
+        int64_matrix* res = matrix_ctor(n, n);
+        for(uint64_t i = 0; i < n; i++) {
+                for(uint64_t j = 0; j < n; j++) {
+                        res->ptr[i][j] = a->ptr[i * n + j];
+                }
+        }
+        int_free(a);
+        return res;
+}
+
+void SORTCALL matrix_print(int64_matrix* A) {
+	for(uint64_t i = 0; i < A->rows; i++) {
+		for(uint64_t j = 0; j < A->cols; j++) {
+			printf("%5ld", A->ptr[i][j]);
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
+
+void SORTCALL matrix_free(int64_matrix* A) {
+	for(uint64_t i = 0; i < A->rows; i++) {
+		free(A->ptr[i]);
+	}
+	free(A->ptr);
+	free(A);
+}
+
+void SORTCALL strassen_print(strassen_matrix* A) {
+        for(uint64_t i = A->rmin; i < A->size; i++) {
+                for(uint64_t j = A->cmin; j < A->size; j++) {
+                        printf("%5ld", A->ptr[i][j]);
+                }
+                printf("\n");
+        }
+	printf("\n");
+}
+
+void SORTCALL strassen_free(strassen_matrix* A) {
+        for(uint64_t i = A->rmin; i < A->size; i++) {
+                free(A->ptr[i]);
+        }
+        free(A->ptr);
+        free(A);
+}
+
+
+int64_matrix* SORTCALL matrix_multiply(int64_matrix* A, int64_matrix* B) {
+	if(A->cols != B->rows) { return 0; }
+	int64_matrix* res = matrix_ctor(A->rows, B->cols);
+	for(uint64_t i = 0; i < A->rows; i++) {
+		for(uint64_t j = 0; j < B->cols; j++) {
+			res->ptr[i][j] = 0;
+			for(uint64_t k = 0; k < A->cols; k++) {
+				res->ptr[i][j] += A->ptr[i][k] * B->ptr[k][j];
 			}
 		}
 	}
 	return res;
+}
+
+strassen_matrix* partition_matrix(strassen_matrix* M, int16_t corner) {
+	strassen_matrix* res = malloc(sizeof(*res));
+	res->ptr = M->ptr;
+	res->rmin = (corner >> 1) * (M->size >> 1) + M->rmin;
+	res->cmin = (corner % 2) * (M->size >> 1) + M->cmin;
+	res->size = M->size >> 1; 
+	return res;
+}
+
+strassen_matrix* subtract_matrix(strassen_matrix* A, strassen_matrix* B) {
+	uint64_t n = A->size;
+	strassen_matrix* S = matrix_to_strass(matrix_ctor(n, n));
+	for(uint64_t i = 0; i < n; i++) {
+		for(uint64_t j = 0; j < n; j++) {
+			S->ptr[i][j] = A->ptr[A->rmin + i][A->cmin + j] - B->ptr[B->rmin + i][B->cmin + j]; 
+		}
+	}
+	return S;
+}
+
+strassen_matrix* add_matrix(strassen_matrix* A, strassen_matrix* B) {
+        uint64_t n = A->size;
+        strassen_matrix* S = matrix_to_strass(matrix_ctor(n, n));
+        for(uint64_t i = 0; i < n; i++) {
+                for(uint64_t j = 0; j < n; j++) {
+                        S->ptr[i][j] = A->ptr[A->rmin + i][A->cmin + j] + B->ptr[B->rmin + i][B->cmin + j];
+                }
+        }
+        return S;
+}
+
+void copy_matrix(strassen_matrix* src, strassen_matrix* dest) {
+	uint64_t n = src->size;
+        for(uint64_t i = 0; i < n; i++) {
+                for(uint64_t j = 0; j < n; j++) {
+                        dest->ptr[dest->rmin + i][dest->cmin + j] = src->ptr[i][j];
+                }
+        }
+}
+
+strassen_matrix* SORTCALL matrix_to_strass(int64_matrix* a) {
+	strassen_matrix* res = malloc(sizeof(*res));
+	if(a->rows != 1 && (a->rows & (a->rows - 1))) {
+		uint64_t p2 = 1;
+		while(p2 < a->rows) {
+			p2 <<= 1;
+		}
+		a->ptr = realloc(a->ptr, sizeof(int64_t*) * p2);
+		for(uint64_t i = 0; i < a->rows; i++) {
+			a->ptr[i] = realloc(a->ptr[i], sizeof(int64_t) * p2);
+		}
+		for(uint64_t i = a->rows; i < p2; i++) {
+			a->ptr[i] = malloc(sizeof(int64_t) * p2);
+		}
+		for(uint64_t i = 0; i < a->rows; i++) {
+                        for(uint64_t j = a->rows; j < p2; j++) {
+                                a->ptr[i][j] = 0;
+                        }
+                }
+		for(uint64_t i = a->rows; i < p2; i++) {
+			for(uint64_t j = 0; j < p2; j++) {
+				a->ptr[i][j] = 0;
+			}
+		}
+		res->size = p2;
+	}
+	else {
+		res->size = a->rows;
+	}
+	res->ptr = a->ptr;
+	res->rmin = 0;
+	res->cmin = 0;
+	return res;
+}
+
+
+strassen_matrix* SORTCALL strassen_multiply(strassen_matrix* A, strassen_matrix* B) {
+	uint64_t n = A->size;
+	strassen_matrix* C = matrix_to_strass(matrix_ctor(n, n));
+	if(n == 1) { C->ptr[0][0] = A->ptr[A->rmin][A->cmin] * B->ptr[B->rmin][B->cmin]; }
+	else {
+		strassen_matrix* A11 = partition_matrix(A, 0);
+		strassen_matrix* A12 = partition_matrix(A, 1);
+		strassen_matrix* A21 = partition_matrix(A, 2);
+		strassen_matrix* A22 = partition_matrix(A, 3);
+		strassen_matrix* B11 = partition_matrix(B, 0);
+		strassen_matrix* B12 = partition_matrix(B, 1);
+		strassen_matrix* B21 = partition_matrix(B, 2);
+		strassen_matrix* B22 = partition_matrix(B, 3);
+		strassen_matrix* C11 = partition_matrix(C, 0);
+		strassen_matrix* C12 = partition_matrix(C, 1);
+		strassen_matrix* C21 = partition_matrix(C, 2);
+		strassen_matrix* C22 = partition_matrix(C, 3);
+
+		strassen_matrix* S1 = subtract_matrix(B12, B22);
+		strassen_matrix* S2 = add_matrix(A11, A12);
+		strassen_matrix* S3 = add_matrix(A21, A22);
+		strassen_matrix* S4 = subtract_matrix(B21, B11);
+		strassen_matrix* S5 = add_matrix(A11, A22);
+		strassen_matrix* S6 = add_matrix(B11, B22);
+		strassen_matrix* S7 = subtract_matrix(A12, A22);
+		strassen_matrix* S8 = add_matrix(B21, B22);
+		strassen_matrix* S9 = subtract_matrix(A11, A21);
+		strassen_matrix* S10 = add_matrix(B11, B12);
+
+		strassen_matrix* P1 = strassen_multiply(A11, S1);
+		strassen_matrix* P2 = strassen_multiply(S2, B22);
+		strassen_matrix* P3 = strassen_multiply(S3, B11);
+		strassen_matrix* P4 = strassen_multiply(A22, S4);
+		strassen_matrix* P5 = strassen_multiply(S5, S6);
+		strassen_matrix* P6 = strassen_multiply(S7, S8);
+		strassen_matrix* P7 = strassen_multiply(S9, S10);
+
+
+		/*strassen_print(S1);
+		strassen_print(S2);
+		strassen_print(S3);
+		strassen_print(S4);
+		strassen_print(S5);
+		strassen_print(P1);
+		strassen_print(P2);
+		strassen_print(P3);
+		strassen_print(P4);
+		strassen_print(P5);*/
+		
+		copy_matrix(add_matrix(subtract_matrix(add_matrix(P5, P4), P2), P6), C11);
+		copy_matrix(add_matrix(P1, P2), C12);
+		copy_matrix(add_matrix(P3, P4), C21);
+		copy_matrix(subtract_matrix(subtract_matrix(add_matrix(P5, P1), P3), P7), C22);
+	}	
+	return C;
 }
 
 int SORTCALL int_verf(int64_array* a, char mode){
