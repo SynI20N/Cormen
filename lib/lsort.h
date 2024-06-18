@@ -78,6 +78,9 @@ SORTAPI uint64_t SORTCALL binary_search(int64_array* a, int64_t value);
 SORTAPI int64_sub SORTCALL brute_force_subarray(int64_array* a);
 SORTAPI int64_sub SORTCALL recursive_subarray(int64_t* a, int64_t lo, int64_t hi);
 SORTAPI int64_sub SORTCALL find_maximum_subarray(int64_array* a);
+//random permutations
+SORTAPI int64_array* SORTCALL permute_by_sort(int64_array* a);
+SORTAPI int64_array* SORTCALL randomize_in_place(int64_array* a);
 //INT MATRIX FUNCTIONS
 SORTAPI int64_matrix* SORTCALL matrix_ctor(uint64_t rows, uint64_t cols);
 SORTAPI strassen_matrix* SORTCALL matrix_to_strass(int64_matrix* a);

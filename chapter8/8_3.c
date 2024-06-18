@@ -8,7 +8,7 @@
 #define INT_RDX_COUNT 20
 #define CHAR_RDX_COUNT 26
 
-typedef struct{
+typedef struct {
 	char** T;
 	char** B;
 } sort_data;
