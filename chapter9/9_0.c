@@ -35,8 +35,14 @@ int main(int argc, char** argv) {
 	else {
 		printf("borders incorrect\n");
 	}
-	int64_t orderi = randomized_select(arr->ptr, 0, arr->count - 1, i);
-	printf("%lld \n", orderi);
+	int64_t orderi = quick_select(arr->ptr, 0, arr->count - 1, i);
+	int64_t iter_orderi = quick_select_iterative(arr->ptr, 0, arr->count - 1, i);
+	if(orderi == iter_orderi) {
+		printf("select functions work correctly\n");
+	}
+	else {
+		printf("at least one select function is incorrect\n");
+	}
 	int_free(arr);
 	return 0;
 }

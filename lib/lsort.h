@@ -70,7 +70,8 @@ SORTAPI void SORTCALL insertion_sort(int64_array* arr);
 SORTAPI void SORTCALL selection_sort(int64_array* arr);
 SORTAPI void SORTCALL merge_sort(int64_array* a, uint64_t lo, uint64_t hi);
 //select
-SORTAPI int64_t SORTCALL randomized_select(int64_t* a, int64_t lo, int64_t hi, uint64_t i);
+SORTAPI int64_t SORTCALL quick_select(int64_t* a, int64_t lo, int64_t hi, uint64_t i);
+SORTAPI int64_t SORTCALL quick_select_iterative(int64_t* a, int64_t lo, int64_t hi, uint64_t i);
 //search
 SORTAPI uint64_t SORTCALL linear_search(int64_array* a, int64_t value);
 SORTAPI uint64_t SORTCALL binary_search(int64_array* a, int64_t value);

@@ -205,7 +205,7 @@ void SORTCALL selection_sort(int64_array* arr) {
 	}
 }
 
-int64_t SORTCALL randomized_select(int64_t* a, int64_t lo, int64_t hi, uint64_t i) {
+int64_t SORTCALL quick_select(int64_t* a, int64_t lo, int64_t hi, uint64_t i) {
 	if(lo == hi) {
 		return a[lo];
 	}
@@ -215,9 +215,27 @@ int64_t SORTCALL randomized_select(int64_t* a, int64_t lo, int64_t hi, uint64_t 
 		return a[q];
 	}
 	else if(i < k) {
-		return randomized_select(a, lo, q, i);
+		return quick_select(a, lo, q, i);
 	}
-	else return randomized_select(a, q + 1, hi, i - k);
+	else return quick_select(a, q + 1, hi, i - k);
+}
+
+int64_t SORTCALL quick_select_iterative(int64_t* a, int64_t lo, int64_t hi, uint64_t i) {
+	while(lo < hi) {
+		int64_t q = hoare_partition(a, lo, hi);
+		uint64_t k = q - lo + 1;
+		if(i == k) {
+			return a[q];
+		}
+		else if(i < k) {
+			hi = q;
+		}
+		else {
+			lo = q + 1;
+			i -= k;
+		}
+	}
+	return a[lo];
 }
 
 uint64_t SORTCALL linear_search(int64_array* a, int64_t value) {
