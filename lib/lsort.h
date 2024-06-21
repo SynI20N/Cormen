@@ -64,12 +64,14 @@ SORTAPI int64_ord SORTCALL borders(int64_array* a);
 SORTAPI int64_t SORTCALL find_max(int64_array* a);
 SORTAPI int64_t SORTCALL find_min(int64_array* a);
 //sort
+SORTAPI int64_t SORTCALL hoare_partition_around(int64_t* arr, int64_t lo, int64_t hi, int64_t x);
 SORTAPI int64_t SORTCALL hoare_partition(int64_t* arr, int64_t lo, int64_t hi);
 SORTAPI void SORTCALL modified_quicksort(int64_t* a, int64_t lo, int64_t hi, int64_t k);
 SORTAPI void SORTCALL insertion_sort(int64_array* arr);
 SORTAPI void SORTCALL selection_sort(int64_array* arr);
 SORTAPI void SORTCALL merge_sort(int64_array* a, uint64_t lo, uint64_t hi);
 //select
+SORTAPI int64_t SORTCALL linear_select(int64_t* a, int64_t lo, int64_t hi, uint64_t i);
 SORTAPI int64_t SORTCALL quick_select(int64_t* a, int64_t lo, int64_t hi, uint64_t i);
 SORTAPI int64_t SORTCALL quick_select_iterative(int64_t* a, int64_t lo, int64_t hi, uint64_t i);
 //search

@@ -35,14 +35,19 @@ int main(int argc, char** argv) {
 	else {
 		printf("borders incorrect\n");
 	}
+	int64_t linear_order = linear_select(arr->ptr, 0, arr->count - 1, i);
 	int64_t orderi = quick_select(arr->ptr, 0, arr->count - 1, i);
 	int64_t iter_orderi = quick_select_iterative(arr->ptr, 0, arr->count - 1, i);
-	if(orderi == iter_orderi) {
+	if(orderi == linear_order) {
 		printf("select functions work correctly\n");
 	}
 	else {
 		printf("at least one select function is incorrect\n");
 	}
+	int_print(arr);
+	printf("linear ans = [%ld]\n", linear_order);
+	printf("quick ans = [%ld]\n", orderi);
+	
 	int_free(arr);
 	return 0;
 }
