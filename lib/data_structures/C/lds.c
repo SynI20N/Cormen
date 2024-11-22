@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <lsort.hpp>
 #include <lds.h>
 
 int16_t DSCALL enqueue(int64_queue *Q, int64_t x)
